@@ -127,3 +127,28 @@ cmd.append('echo all done')
 
 activity.command = cmd
 ```
+
+## Defaults
+
+Defaults are applied as class-level attributes and are merged down the MRO line.
+
+For example, the `S3DataNode` object inherits from: `DataNode`, and `RunnableObject`.
+Each of these classes can define its own default attributes, but inherits any
+higher-level attributes as well.
+
+```python
+pline.base.RunnableObject.defaults()
+{ 'maximumRetries' : 2,
+  'retryDelay'     : '10 minutes' }
+
+pline.data_nodes.DataNode.defaults()
+{ 'maximumRetries' : 2,
+  'retryDelay'     : '10 minutes',
+  'scheduleType'   : 'timeseries' }
+
+pline.S3DataNode.defaults()
+{ 'maximumRetries'   : 2,
+  'retryDelay'       : '10 minutes',
+  's3EncryptionType' : 'SERVER_SIDE_ENCRYPTION',
+  'scheduleType'     : 'timeseries' }
+```

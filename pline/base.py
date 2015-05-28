@@ -7,7 +7,7 @@ class DataPipelineObject(dict):
         self['fields'] = list()
 
         # Set defalts
-        for k,v in self.defaults.iteritems():
+        for k,v in self.defaults().iteritems():
             setattr(self, k, v)
 
         # Set name/id if given as args
@@ -54,9 +54,9 @@ class DataPipelineObject(dict):
         except StopIteration:
             super(DataPipelineObject, self).__getattr__(key)
 
-    @property
-    def defaults(self):
-        return { k:v for x in type(self).mro()[:-2] for k,v in x._defaults.items() }
+    @classmethod
+    def defaults(cls):
+        return { k:v for x in reversed(cls.mro()[:-2]) for k,v in x._defaults.items() }
 
 
 class TypedDataPipelineObject(DataPipelineObject):
