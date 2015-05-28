@@ -12,7 +12,7 @@ pip install pline
 
 ## Simple usage
 
-Create a pipeline object
+Create a **pipeline** object
 
 ```python
 
@@ -32,7 +32,7 @@ pipeline.connect(
     aws_secret_access_key_id = 'my_secret_key' )
 ```
 
-Create a schedule object
+Create a **schedule** object
 
 ```python
 schedule = pline.Schedule(
@@ -42,7 +42,7 @@ schedule = pline.Schedule(
     occurrences = 1 )
 ```
 
-Create the default pipeline definition. The pipeline object has a helper-method to
+Create the **default pipeline definition**. The pipeline object has a helper-method to
 create this object with sensible defaults:
 
 ```python
@@ -50,7 +50,7 @@ definition = pipeline.definition( schedule,
     pipelineLogUri = "s3://bucket/pipeline/log" )
 ```
 
-Create an EC2 resource on which the pipeline will run
+Create an EC2 **resource** on which the pipeline will run
 
 ```python
 resource = pline.Ec2Resource(
@@ -61,7 +61,7 @@ resource = pline.Ec2Resource(
     schedule     = schedule )
 ```
 
-Create an activity to run
+Create an **activity** to run
 
 ```python
 activity = pline.ShellCommandActivity(
@@ -72,7 +72,7 @@ activity = pline.ShellCommandActivity(
     command  = 'echo hello world' )
 ```
 
-Add the schedule, definition, resource, and activity to the pipeline
+Add the **schedule**, **definition**, **resource**, and **activity** to the pipeline
 
 ```python
 pipeline.add(schedule, definition, resource, activity)
@@ -124,4 +124,6 @@ cmd.append('echo all done')
 #    docker pull localhost:5000/my_docker;\
 #    docker stop registry;\
 #    echo all done
+
+activity.command = cmd
 ```
