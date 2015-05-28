@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 NAME    = 'pline'
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 AUTHOR  = 'amancevice'
 EMAIL   = 'smallweirdnum@gmail.com'
 DESC    = 'AWS Data Pipeline Wrapper'

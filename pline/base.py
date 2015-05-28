@@ -8,7 +8,8 @@ class DataPipelineObject(dict):
 
         # Set defalts
         for k,v in self.defaults().iteritems():
-            setattr(self, k, v)
+            if k not in kwargs:
+                setattr(self, k, v)
 
         # Set name/id if given as args
         if len(args) == 1:
@@ -16,7 +17,7 @@ class DataPipelineObject(dict):
         elif len(args) == 2:
             setattr(self, 'name', str(args[0]))
             setattr(self, 'id',   str(args[1]))
-        elif any(args):
+        elif len(args) > 2:
             raise TypeError("__init__() takes at most 3 arguments (%d given)" % (len(args)+1))
 
         # Set kwargs
@@ -30,7 +31,6 @@ class DataPipelineObject(dict):
             raise KeyError("'name' key must be supplied")
         elif 'id' not in self:
             raise KeyError("'id' key must be supplied")
-
 
     def __setattr__(self, key, value):
         if key in ('id', 'name'):
