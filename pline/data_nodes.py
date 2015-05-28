@@ -1,15 +1,20 @@
-from . import base
+from . import base, constants
 
-class DynamoDBDataNode(base.TypedDataPipelineObject): pass
-
-
-class MySqlDataNode(base.TypedDataPipelineObject): pass
+class DataNode(base.RunnableObject):
+    _defaults = { 'scheduleType' : constants.scheduleType.timeseries }
 
 
-class RedshiftDataNode(base.TypedDataPipelineObject): pass
+class DynamoDBDataNode(DataNode): pass
 
 
-class S3DataNode(base.TypedDataPipelineObject): pass
+class MySqlDataNode(DataNode): pass
 
 
-class SqlDataNode(base.TypedDataPipelineObject): pass
+class RedshiftDataNode(DataNode): pass
+
+
+class S3DataNode(DataNode):
+    _defaults = { 's3EncryptionType' : constants.s3EncryptionType.SERVER_SIDE_ENCRYPTION }
+
+
+class SqlDataNode(DataNode): pass

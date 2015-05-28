@@ -1,10 +1,36 @@
+from . import constants
+
 class DataPipelineObject(dict):
-    def __init__(self, name, id, **kwargs):
-        self['name']   = name
-        self['id']     = id
+    _defaults = dict()
+
+    def __init__(self, *args, **kwargs):
         self['fields'] = list()
+
+        # Set defalts
+        for k,v in self.defaults.iteritems():
+            setattr(self, k, v)
+
+        # Set name/id if given as args
+        if len(args) == 1:
+            setattr(self, 'name', str(args[0]))
+        elif len(args) == 2:
+            setattr(self, 'name', str(args[0]))
+            setattr(self, 'id',   str(args[1]))
+        elif any(args):
+            raise TypeError("__init__() takes at most 3 arguments (%d given)" % (len(args)+1))
+
+        # Set kwargs
         for k,v in kwargs.iteritems():
             setattr(self, k, v)
+
+        # Ensure name/id in self
+        if 'name' not in self and 'id' not in self:
+            raise KeyError("Both 'name' and 'id' keys must be supplied")
+        elif 'name' not in self:
+            raise KeyError("'name' key must be supplied")
+        elif 'id' not in self:
+            raise KeyError("'id' key must be supplied")
+
 
     def __setattr__(self, key, value):
         if key in ('id', 'name'):
@@ -28,11 +54,22 @@ class DataPipelineObject(dict):
         except StopIteration:
             super(DataPipelineObject, self).__getattr__(key)
 
+    @property
+    def defaults(self):
+        return { k:v for x in type(self).mro()[:-2] for k,v in x._defaults.items() }
+
 
 class TypedDataPipelineObject(DataPipelineObject):
-    def __init__(self, name, id, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs.setdefault('type', type(self).__name__)
-        super(TypedDataPipelineObject, self).__init__(name, id, **kwargs)
+        super(TypedDataPipelineObject, self).__init__(*args, **kwargs)
 
 
-class Schedule(TypedDataPipelineObject): pass
+class Schedule(TypedDataPipelineObject):
+    _defaults = { 'id'      : 'DefaultSchedule',
+                 'startAt' : constants.startAt.FIRST_ACTIVATION_DATE_TIME }
+
+
+class RunnableObject(TypedDataPipelineObject):
+    _defaults = { 'maximumRetries' : 2,
+                  'retryDelay'     : '10 minutes' }

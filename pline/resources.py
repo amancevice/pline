@@ -1,6 +1,9 @@
 from . import base
 
-class Ec2Resource(base.TypedDataPipelineObject): pass
+class Resource(base.TypedDataPipelineObject): pass
 
 
-class EmrCluster(base.TypedDataPipelineObject): pass
+class Ec2Resource(Resource): pass
+
+
+class EmrCluster(Resource): pass

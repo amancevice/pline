@@ -1,27 +1,30 @@
-from . import base
+from . import base, constants
 
-class CopyActivity(base.TypedDataPipelineObject): pass
+class Activity(base.RunnableObject):
+    _defaults = { 'scheduleType' : constants.scheduleType.timeseries }
 
-
-class EmrActivity(base.TypedDataPipelineObject): pass
-
-
-class HiveActivity(base.TypedDataPipelineObject): pass
+class CopyActivity(Activity): pass
 
 
-class HiveCopyActivity(base.TypedDataPipelineObject): pass
+class EmrActivity(Activity): pass
 
 
-class PigActivity(base.TypedDataPipelineObject): pass
+class HiveActivity(Activity): pass
 
 
-class RedshiftCopyActivity(base.TypedDataPipelineObject): pass
+class HiveCopyActivity(Activity): pass
 
 
-class ShellCommandActivity(base.TypedDataPipelineObject): pass
+class PigActivity(Activity): pass
 
 
-class SqlActivity(base.TypedDataPipelineObject): pass
+class RedshiftCopyActivity(Activity): pass
+
+
+class ShellCommandActivity(Activity): pass
+
+
+class SqlActivity(Activity): pass
 
 
 class ShellCommand(object):

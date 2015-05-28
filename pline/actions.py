@@ -1,6 +1,9 @@
 from . import base
 
-class SnsAlarm(base.TypedDataPipelineObject): pass
+class Action(base.TypedDataPipelineObject): pass
 
 
-class Terminate(base.TypedDataPipelineObject): pass
+class SnsAlarm(Action): pass
+
+
+class Terminate(Action): pass

@@ -1,18 +1,21 @@
 from . import base
 
-class CSV(base.TypedDataPipelineObject): pass
+class DataFormat(base.TypedDataPipelineObject): pass
 
 
-class Custom(base.TypedDataPipelineObject): pass
+class CSV(DataFormat): pass
 
 
-class DynamoDBDataFormat(base.TypedDataPipelineObject): pass
+class Custom(DataFormat): pass
 
 
-class DynamoDBExportDataFormat(base.TypedDataPipelineObject): pass
+class DynamoDBDataFormat(DataFormat): pass
 
 
-class RegEx(base.TypedDataPipelineObject): pass
+class DynamoDBExportDataFormat(DataFormat): pass
 
 
-class TSV(base.TypedDataPipelineObject): pass
+class RegEx(DataFormat): pass
+
+
+class TSV(DataFormat): pass

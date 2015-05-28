@@ -1,18 +1,21 @@
 from . import base
 
-class DynamoDBDataExists(base.TypedDataPipelineObject): pass
+class Precondition(base.TypedDataPipelineObject): pass
 
 
-class DynamoDBTableExists(base.TypedDataPipelineObject): pass
+class DynamoDBDataExists(Precondition): pass
 
 
-class Exists(base.TypedDataPipelineObject): pass
+class DynamoDBTableExists(Precondition): pass
 
 
-class S3KeyExists(base.TypedDataPipelineObject): pass
+class Exists(Precondition): pass
 
 
-class S3PrefixNotEmpty(base.TypedDataPipelineObject): pass
+class S3KeyExists(Precondition): pass
 
 
-class ShellCommandPrecondition(base.TypedDataPipelineObject): pass
+class S3PrefixNotEmpty(Precondition): pass
+
+
+class ShellCommandPrecondition(Precondition): pass
