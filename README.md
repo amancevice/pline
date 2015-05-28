@@ -102,3 +102,26 @@ Update the pipeline on AWS and activate it
 pipeline.update()
 pipeline.activate()
 ```
+
+## Advanced ShellCommandActivity use
+
+The class `ShellCommand` can be used to compose chained commands
+
+```python
+cmd = pline.ShellCommand(
+    'docker start registry',
+    'sleep 3',
+    'docker pull localhost:5000/my_docker',
+    'docker stop registry' )
+# => docker start registry;\
+#    sleep 3;\
+#    docker pull localhost:5000/my_docker;\
+#    docker stop registry
+
+cmd.append('echo all done')
+# => docker start registry;\
+#    sleep 3;\
+#    docker pull localhost:5000/my_docker;\
+#    docker stop registry;\
+#    echo all done
+```
