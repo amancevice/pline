@@ -2,7 +2,7 @@
 
 AWS Pipeline Wrapper for boto. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.0.2`
+Last updated: `0.0.3`
 
 ## Installation
 
@@ -10,7 +10,7 @@ Last updated: `0.0.2`
 pip install pline
 ```
 
-## Simple usage
+## Usage
 
 Create a **pipeline** object
 
