@@ -72,7 +72,8 @@ class Pipeline(object):
             Returns:
                 boto response. """
         pipeline_id = pipeline_id or self.pipeline_id
-        return self.region.put_pipeline_definition(self.objects, pipeline_id)
+        objects = map(dict, self.objects)
+        return self.region.put_pipeline_definition(objects, pipeline_id)
 
     def create(self):
         """ Create pipeline and set pipeline_id. """
