@@ -1,8 +1,9 @@
+import itertools
 from . import keywords
 
 class DataPipelineObject(object):
     def __init__(self, *args, **kwargs):
-        self.fields = list()
+        self.fields = dict()
 
         # Set name/id if given as args
         if len(args) == 1:
@@ -26,24 +27,27 @@ class DataPipelineObject(object):
             raise TypeError("'id' key must be supplied")
 
     def __iter__(self):
+        def iterhelper(keyvalue):
+            key, value = keyvalue
+            if isinstance(value, list):
+                map(iterhelper, [(key, x) for x in value])
+            elif isinstance(value, DataPipelineObject):
+                yield { 'key' : key, 'refValue' : value.id }
+            elif isinstance(value, bool):
+                yield { 'key' : key, 'stringValue' : str(value).lower() }
+            else:
+                yield { 'key' : key, 'stringValue' : str(value) }
+
         yield 'name',   self.name
         yield 'id',     self.id
-        yield 'fields', self.fields
+        yield 'fields', list(itertools.chain(*map(iterhelper, self.fields.iteritems())))
 
     def __repr__(self):
         return "<%s name: \"%s\", id: \"%s\">" % (type(self).__name__, self.name, self.id)
 
     def __setattr__(self, key, value):
-        if key not in ('id', 'name'):
-            if isinstance(value, DataPipelineObject):
-                self.fields.append({ 'key' : key, 'refValue' : value.id })
-            elif isinstance(value, bool):
-                self.fields.append({ 'key' : key, 'stringValue' : str(value).lower() })
-            elif isinstance(value, list):
-                for item in value:
-                    self.__setattr__(key, item)
-            else:
-                self.fields.append({ 'key' : key, 'stringValue' : str(value) })
+        if key not in ('id', 'name', 'fields'):
+            self.fields[key] = value
         super(DataPipelineObject, self).__setattr__(key, value)
 
 
