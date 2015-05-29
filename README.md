@@ -2,7 +2,7 @@
 
 AWS Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.0.3`
+Last updated: `0.1.0`
 
 ## Installation
 
