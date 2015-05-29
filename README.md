@@ -1,6 +1,6 @@
-# pline
+# pline Python library
 
-AWS Pipeline Wrapper for boto. Construct a Data Pipeline using Python objects.
+AWS Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
 Last updated: `0.0.3`
 
@@ -10,21 +10,80 @@ Last updated: `0.0.3`
 pip install pline
 ```
 
-## Usage
+## What is it?
 
-Create a **pipeline** object
+The payload `boto` requires for a pipeline definition is somewhat complex. This library 
+provides the tools to model your pipeline as Python objects and wraps calls to `boto` 
+that transform the payload into the proper format behind the scenes.
+
+#### DataPipelineObject base class
+
+Every object in a pipeline is an acestor of the `DataPipelineObject` class. Each object 
+owns three key attributes:
+
+* `name`
+* `id`
+* `fields`
+
+The `name` and `id` attributes must be set at initialization time, but `fields` is 
+handled internally by the object and should not be accessed directly.
+
+Setting an object's attribute can be done via the initialization call or after the fact:
+
+```python
+node = pline.S3DataNode('MyDataNode1', 'MyDataNode1', workerGroup='TestGroup')
+# => <S3DataNode name: "MyDataNode1", id: "MyDataNode1">
+node.directoryPath = 's3://bucket/pipeline/'
+print node.workerGroup
+# => 'TestGroup'
+print node.directoryPath
+# => 's3://bucket/pipeline/'
+```
+
+`Pipeline` instances handle the conversion of pipeline objects to a payload, but objects can
+be viewed in `boto`-friendly format by converting them to a `dict`:
+
+```python
+dict(node)
+{ 'name'   : 'MyDataNode1',
+  'id'     : 'MyDataNode1',
+  'fields' : [
+    { 'key' : 'type',          'stringValue' : 'S3DataNode' },
+    { 'key' : 'directoryPath', 'stringValue' : 's3://bucket/pipeline/' },
+    { 'key' : 'workerGroup',   'stringValue' : 'TestGroup' }, ] }
+```
+
+#### Typed DataPipelineObjects
+
+Most objects in a data pipeline are typed -- that is, they are given a `type` attribute on initialization
+that is added to the `fields` attribute. By default, the type is taken from the name of the class (which
+corresponds to the type given by AWS' specs).
+
+Custom classes can override this behavior by defining a `TYPE_NAME` class-level attribute:
+
+```python
+class MyCustomS3DataNode(pline.S3DataNode):
+    TYPE_NAME = 'S3DataNode'
+    # ...
+```
+
+## Example Pipeline
+
+#### Create a pipeline object
 
 ```python
 
 pipeline = pline.Pipeline(
     name      = 'MyPipeline',
     unique_id = 'MyPipeline1',
-    desc      = 'An example',
+    desc      = 'An example pipeline description',
     region    = 'us-west-2' )
 ```
 
-The pipeline will connect to AWS automatically if you have set your AWS credentials at the
-environmental level. If you want to connect using a specific configuration:
+#### Connect (optional)
+
+The pipeline will connect to AWS automatically if you have your AWS credentials set at
+the environmental level. If you want to connect using a specific configuration:
 
 ```python
 pipeline.connect(
@@ -32,25 +91,29 @@ pipeline.connect(
     aws_secret_access_key_id = 'my_secret_key' )
 ```
 
-Create a **schedule** object
+#### Create a schedule object
 
 ```python
 schedule = pline.Schedule(
     name        = 'Schedule',
     id          = 'Schedule1',
     period      = '1 day',
+    startAt     = pline.startAt.FIRST_ACTIVATION_DATE_TIME,
     occurrences = 1 )
 ```
 
-Create the **default pipeline definition**. The pipeline object has a helper-method to
-create this object with sensible defaults:
+#### Create the default pipeline definition 
+
+The pipeline object has a helper-method to create this object with sensible defaults:
 
 ```python
 definition = pipeline.definition( schedule,
     pipelineLogUri = "s3://bucket/pipeline/log" )
 ```
 
-Create an EC2 **resource** on which the pipeline will run
+#### Create an EC2 resource
+
+This will be the machine running the tasks.
 
 ```python
 resource = pline.Ec2Resource(
@@ -61,7 +124,7 @@ resource = pline.Ec2Resource(
     schedule     = schedule )
 ```
 
-Create an **activity** to run
+#### Create an activity
 
 ```python
 activity = pline.ShellCommandActivity(
@@ -72,27 +135,36 @@ activity = pline.ShellCommandActivity(
     command  = 'echo hello world' )
 ```
 
-Add the **schedule**, **definition**, **resource**, and **activity** to the pipeline
+#### Add the objects to the pipeline
 
 ```python
 pipeline.add(schedule, definition, resource, activity)
 ```
 
-Create the pipeline in AWS
+#### Create the pipeline in AWS
+
+This will send the request to create a pipeline through boto
 
 ```python
 pipeline.create()
 ```
 
-Create a new object, asscociate it with an existing object and add it to the pipeline
+#### Adding new objects to the pipeline
+
+Sometimes you may want to add an object to the pipeline after it has been created
 
 ```python
+# Add an alert
 sns_alarm = pline.SnsAlarm(
     name     = 'SnsAlarm',
     id       = 'SnsAlarm1',
     topicArn = 'arn:aws:sns:us-east-1:12345678abcd:my-arn',
     role     = 'DataPipelineDefaultRole' )
+
+# Associate it with the activity
 activity.onFailure = sns_alarm
+
+# Add it to the pipeline
 pipeline.add(sns_alarm)
 ```
 
@@ -103,9 +175,9 @@ pipeline.update()
 pipeline.activate()
 ```
 
-## Advanced ShellCommandActivity use
+## ShellCommand helper
 
-The class `ShellCommand` can be used to compose chained commands
+The `ShellCommand` class can be used to compose chained commands
 
 ```python
 cmd = pline.ShellCommand(
@@ -126,29 +198,4 @@ cmd.append('echo all done')
 #    echo all done
 
 activity.command = cmd
-```
-
-## Defaults
-
-Defaults are applied as class-level attributes and are merged down the MRO line.
-
-For example, the `S3DataNode` object inherits from: `DataNode`, and `RunnableObject`.
-Each of these classes can define its own default attributes, but inherits any
-higher-level attributes as well.
-
-```python
-pline.base.RunnableObject.defaults()
-{ 'maximumRetries' : 2,
-  'retryDelay'     : '10 minutes' }
-
-pline.data_nodes.DataNode.defaults()
-{ 'maximumRetries' : 2,
-  'retryDelay'     : '10 minutes',
-  'scheduleType'   : 'timeseries' }
-
-pline.S3DataNode.defaults()
-{ 'maximumRetries'   : 2,
-  'retryDelay'       : '10 minutes',
-  's3EncryptionType' : 'SERVER_SIDE_ENCRYPTION',
-  'scheduleType'     : 'timeseries' }
 ```
