@@ -1,7 +1,6 @@
 from . import base, keywords
 
-class DataNode(base.RunnableObject):
-    _defaults = { 'scheduleType' : keywords.scheduleType.timeseries }
+class DataNode(base.RunnableObject): pass
 
 
 class DynamoDBDataNode(DataNode): pass
@@ -13,8 +12,7 @@ class MySqlDataNode(DataNode): pass
 class RedshiftDataNode(DataNode): pass
 
 
-class S3DataNode(DataNode):
-    _defaults = { 's3EncryptionType' : keywords.s3EncryptionType.SERVER_SIDE_ENCRYPTION }
+class S3DataNode(DataNode): pass
 
 
 class SqlDataNode(DataNode): pass

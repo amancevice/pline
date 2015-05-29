@@ -1,15 +1,8 @@
 from . import keywords
 
 class DataPipelineObject(object):
-    _defaults = dict()
-
     def __init__(self, *args, **kwargs):
         self.fields = list()
-
-        # Set defalts
-        for k,v in self.defaults().iteritems():
-            if k not in kwargs:
-                setattr(self, k, v)
 
         # Set name/id if given as args
         if len(args) == 1:
@@ -53,11 +46,6 @@ class DataPipelineObject(object):
                 self.fields.append({ 'key' : key, 'stringValue' : str(value) })
         super(DataPipelineObject, self).__setattr__(key, value)
 
-    @classmethod
-    def defaults(cls):
-        """ Assembles all inherited defaults. """
-        return { k:v for x in reversed(cls.mro()[:-2]) for k,v in x._defaults.items() }
-
 
 class TypedDataPipelineObject(DataPipelineObject):
     def __init__(self, *args, **kwargs):
@@ -65,11 +53,7 @@ class TypedDataPipelineObject(DataPipelineObject):
         super(TypedDataPipelineObject, self).__init__(*args, **kwargs)
 
 
-class Schedule(TypedDataPipelineObject):
-    _defaults = { 'id'      : 'DefaultSchedule',
-                 'startAt' : keywords.startAt.FIRST_ACTIVATION_DATE_TIME }
+class Schedule(TypedDataPipelineObject): pass
 
 
-class RunnableObject(TypedDataPipelineObject):
-    _defaults = { 'maximumRetries' : 2,
-                  'retryDelay'     : '10 minutes' }
+class RunnableObject(TypedDataPipelineObject): pass

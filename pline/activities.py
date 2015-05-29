@@ -1,7 +1,6 @@
 from . import base, keywords
 
-class Activity(base.RunnableObject):
-    _defaults = { 'scheduleType' : keywords.scheduleType.timeseries }
+class Activity(base.RunnableObject): pass
 
 class CopyActivity(Activity): pass
 
