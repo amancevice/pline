@@ -1,10 +1,7 @@
 # pline Changelog
 
-0.0.5
-* Bugfix for defaults
-
-0.0.4
-* Sensible default control
+0.1.0
+* Initial stable release
 
 0.0.1
-* initial release
+* Initial release

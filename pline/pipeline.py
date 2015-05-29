@@ -1,5 +1,5 @@
 import boto.datapipeline
-from . import base, constants
+from . import base, keywords
 
 class Pipeline(object):
     def __init__(self, name, unique_id, desc=None, region='us-east-1', pipeline_id=None):
@@ -19,8 +19,8 @@ class Pipeline(object):
             return self._region
 
     def definition(self, schedule,
-        scheduleType        = constants.scheduleType.cron,
-        failureAndRerunMode = constants.failureAndRerunMode.CASCADE,
+        scheduleType        = keywords.scheduleType.cron,
+        failureAndRerunMode = keywords.failureAndRerunMode.CASCADE,
         pipelineLogUri      = None,
         role                = 'DataPipelineDefaultRole',
         resourceRole        = 'DataPipelineDefaultResourceRole',
@@ -78,7 +78,8 @@ class Pipeline(object):
         """ Create pipeline and set pipeline_id. """
         response = self.region.create_pipeline(self.name, self.unique_id, self.desc)
         self.pipeline_id = response['pipelineId']
-        self.update()
+        if any(self.objects):
+            self.update()
         return response
 
     def add(self, *objects):
