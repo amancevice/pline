@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.1.2
+* Made fields a property
+
 0.1.1
 * Fixed issue where field values could be duplicated
 

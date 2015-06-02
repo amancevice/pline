@@ -3,8 +3,6 @@ from . import keywords
 
 class DataPipelineObject(object):
     def __init__(self, *args, **kwargs):
-        self.fields = dict()
-
         # Set name/id if given as args
         if len(args) == 1:
             setattr(self, 'name', str(args[0]))
@@ -49,6 +47,15 @@ class DataPipelineObject(object):
         if key not in ('id', 'name', 'fields'):
             self.fields[key] = value
         super(DataPipelineObject, self).__setattr__(key, value)
+
+    @property
+    def fields(self):
+        try:
+            return self._fields
+        except AttributeError:
+            self._fields = dict()
+            return self._fields
+
 
 
 class TypedDataPipelineObject(DataPipelineObject):
