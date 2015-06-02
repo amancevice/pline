@@ -1,6 +1,6 @@
 # pline Changelog
 
-0.1.2
+0.1.3
 * Made fields a property
 
 0.1.1

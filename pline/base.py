@@ -44,7 +44,7 @@ class DataPipelineObject(object):
         return "<%s name: \"%s\", id: \"%s\">" % (type(self).__name__, self.name, self.id)
 
     def __setattr__(self, key, value):
-        if key not in ('id', 'name', 'fields'):
+        if key not in ('id', 'name', '_fields'):
             self.fields[key] = value
         super(DataPipelineObject, self).__setattr__(key, value)
 
