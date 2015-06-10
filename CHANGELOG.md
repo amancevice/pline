@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.1.5
+* Added version requirement to setup.py for boto
+
 0.1.4
 * Fixed bug in list assembly
 

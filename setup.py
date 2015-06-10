@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 NAME    = 'pline'
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 AUTHOR  = 'amancevice'
 EMAIL   = 'smallweirdnum@gmail.com'
 DESC    = 'AWS Data Pipeline Wrapper'
@@ -27,7 +27,7 @@ setup( name                 = NAME,
                                 "Operating System :: OS Independent",
                                 "Programming Language :: Python :: 2.7",
                                 "Topic :: Utilities", ],
-       install_requires     = [ "boto",
+       install_requires     = [ "boto>=2.38.0",
                                 "nose",
                                 "mock" ],
        test_suite           = "nose.collector" )
