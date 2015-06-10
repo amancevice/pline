@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.1.4
+* Fixed bug in list assembly
+
 0.1.3
 * Made fields a property
 

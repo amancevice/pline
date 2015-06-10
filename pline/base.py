@@ -28,7 +28,9 @@ class DataPipelineObject(object):
         def iterhelper(keyvalue):
             key, value = keyvalue
             if isinstance(value, list):
-                map(iterhelper, [(key, x) for x in value])
+                for x in value:
+                    for item in iterhelper((key,x)):
+                        yield item
             elif isinstance(value, DataPipelineObject):
                 yield { 'key' : key, 'refValue' : value.id }
             elif isinstance(value, bool):
