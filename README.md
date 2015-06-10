@@ -1,8 +1,8 @@
 # pline Python library
 
-AWS Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
+AWS Data Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.1.0`
+Last updated: `0.1.5`
 
 ## Installation
 
@@ -10,11 +10,25 @@ Last updated: `0.1.0`
 pip install pline
 ```
 
-## What is it?
+## Overview
 
 The payload `boto` requires for a pipeline definition is somewhat complex. This library 
-provides the tools to model your pipeline as Python objects and wraps calls to `boto` 
-that transform the payload into the proper format behind the scenes.
+provides the tools to model your pipeline using Python objects and transform the payload
+into the expected data structure.
+
+```python
+my_activity = pline.ShellCommandActivity(name='MyActivity', id='Activity_adbc1234')
+my_activity.command = "echo $1 $2"
+my_activity.scriptArgument = ['hello', 'world']
+
+dict(my_activity)
+{ 'id'     : 'Activity_adbc1234',
+  'name'   : 'MyActivity',
+  'fields' : [ {'key': 'command',        'stringValue': 'echo $1 $2'},
+               {'key': 'type',           'stringValue': 'ShellCommandActivity'},
+               {'key': 'scriptArgument', 'stringValue': 'hello'},
+               {'key': 'scriptArgument', 'stringValue': 'world'} ]}
+ ```
 
 #### DataPipelineObject base class
 
