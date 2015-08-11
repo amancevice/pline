@@ -61,31 +61,21 @@ class Pipeline(object):
         kwargs.setdefault('aws_secret_access_key', aws_secret_access_key)
         return boto.datapipeline.connect_to_region(region_name, **kwargs)
 
-    def activate(self, pipeline_id=None):
-        """ Activate pipeline.
+    def activate(self):
+        """ Activate pipeline. """
+        assert self.pipeline_id is not None, "pipeline_id is None"
+        return self.region.activate_pipeline(self.pipeline_id)
 
-            Arguments:
-                pipeline_id (str):  Optional ID of pipeline if called without create()
-
-            Returns:
-                boto response. """
-        pipeline_id = pipeline_id or self.pipeline_id
-        return self.region.activate_pipeline(pipeline_id)
-
-    def update(self, pipeline_id=None):
-        """ Update pipeline definition with self.objects.
-
-            Arguments:
-                pipeline_id (str):  Optional ID of pipeline if called without create()
-
-            Returns:
-                boto response. """
-        payload = json.dumps(self.payload(pipeline_id))
+    def update(self):
+        """ Update pipeline definition with self.objects. """
+        assert self.pipeline_id is not None, "pipeline_id is None"
+        payload = json.dumps(self.payload(self.pipeline_id))
         return self.region.make_request(action='PutPipelineDefinition', body=payload)
 
-    def validate(self, pipeline_id=None):
+    def validate(self):
         """ Validate the pipeline definition. """
-        payload = json.dumps(self.payload(pipeline_id))
+        assert self.pipeline_id is not None, "pipeline_id is None"
+        payload = json.dumps(self.payload(self.pipeline_id))
         return self.make_request(action='ValidatePipelineDefinition', body=payload)
 
     def create(self):
