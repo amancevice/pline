@@ -1,4 +1,5 @@
 import boto.datapipeline
+import json
 from . import base, keywords
 
 class Pipeline(object):
@@ -17,6 +18,14 @@ class Pipeline(object):
         except AttributeError:
             self._region = self.connect()
             return self._region
+
+    def payload(self, pipeline_id=None):
+        """ Pipeline payload. """
+        payload = {
+            'pipelineId'      : pipeline_id or self.pipeline_id,
+            'pipelineObjects' : self.objects }
+
+        return payload
 
     def definition(self, schedule,
         scheduleType        = keywords.scheduleType.cron,
@@ -71,9 +80,13 @@ class Pipeline(object):
 
             Returns:
                 boto response. """
-        pipeline_id = pipeline_id or self.pipeline_id
-        objects     = map(dict, self.objects)
-        return self.region.put_pipeline_definition(objects, pipeline_id)
+        payload = json.dumps(self.payload(pipeline_id))
+        return self.region.make_request(action='PutPipelineDefinition', body=payload)
+
+    def validate(self, pipeline_id=None):
+        """ Validate the pipeline definition. """
+        payload = json.dumps(self.payload(pipeline_id))
+        return self.make_request(action='ValidatePipelineDefinition', body=payload)
 
     def create(self):
         """ Create pipeline and set pipeline_id. """
