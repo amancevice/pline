@@ -1,5 +1,10 @@
 # pline Changelog
 
+0.2.0
+* Added parameter support
+* Re-tooled the way things work under the hood a bit
+* Work-around for sending payloads with params
+
 0.1.5
 * Added version requirement to setup.py for boto
 

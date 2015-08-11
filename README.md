@@ -2,7 +2,7 @@
 
 AWS Data Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.1.5`
+Last updated: `0.2.0`
 
 ## Installation
 
@@ -30,7 +30,7 @@ dict(my_activity)
                {'key': 'scriptArgument', 'stringValue': 'world'} ]}
  ```
 
-#### DataPipelineObject base class
+#### Data Pipeline Objects
 
 Every object in a pipeline is an acestor of the `DataPipelineObject` class. Each object 
 owns three key attributes:
@@ -45,7 +45,7 @@ handled internally by the object and should not be accessed directly.
 Setting an object's attribute can be done via the initialization call or after the fact:
 
 ```python
-node = pline.S3DataNode('MyDataNode1', 'MyDataNode1', workerGroup='TestGroup')
+node = pline.S3DataNode(id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
 # => <S3DataNode name: "MyDataNode1", id: "MyDataNode1">
 node.directoryPath = 's3://bucket/pipeline/'
 print node.workerGroup
@@ -67,7 +67,20 @@ dict(node)
     { 'key' : 'workerGroup',   'stringValue' : 'TestGroup' }, ] }
 ```
 
-#### Typed DataPipelineObjects
+#### Data Pipeline Parameters
+
+As of `0.2.0`, `pline` supports passing parameters to data pipelines. Parameters can be added to the 
+pipeline and passed into `DataPipelineObject` instances.
+
+```python
+my_param = pline.String(
+    id = 'MyParam1',
+    value = 'Here is the value I am using',
+    description = 'This value is extremely important',
+    watermark = 'Choose a value between 0 and 99.')
+```
+
+#### Typed Data Pipeline Objects/Parameters
 
 Most objects in a data pipeline are typed -- that is, they are given a `type` attribute on initialization
 that is added to the `fields` attribute. By default, the type is taken from the name of the class (which
@@ -79,14 +92,18 @@ Custom classes can override this behavior by defining a `TYPE_NAME` class-level 
 class MyCustomS3DataNode(pline.S3DataNode):
     TYPE_NAME = 'S3DataNode'
     # ...
+
+class MyCustomParam(pline.AwsS3ObjectKey):
+    TYPE_NAME = 'AwsS3ObjectKey'
+    # ...
 ```
+
 
 ## Example Pipeline
 
 #### Create a pipeline object
 
 ```python
-
 pipeline = pline.Pipeline(
     name      = 'MyPipeline',
     unique_id = 'MyPipeline1',
@@ -109,8 +126,8 @@ pipeline.connect(
 
 ```python
 schedule = pline.Schedule(
-    name        = 'Schedule',
     id          = 'Schedule1',
+    name        = 'Schedule',
     period      = '1 day',
     startAt     = pline.startAt.FIRST_ACTIVATION_DATE_TIME,
     occurrences = 1 )
@@ -131,8 +148,8 @@ This will be the machine running the tasks.
 
 ```python
 resource = pline.Ec2Resource(
-    name         = 'Resource',
     id           = 'Resource1',
+    name         = 'Resource',
     role         = 'DataPipelineDefaultRole',
     resourceRole = 'DataPipelineDefaultResourceRole',
     schedule     = schedule )
@@ -142,17 +159,52 @@ resource = pline.Ec2Resource(
 
 ```python
 activity = pline.ShellCommandActivity(
-    name     = 'MyActivity',
     id       = 'MyActivity1',
+    name     = 'MyActivity',
     runsOn   = resource,
     schedule = schedule,
     command  = 'echo hello world' )
 ```
 
+
+#### Create a parameterized activity and its parameter
+
+```python
+param = pline.String(
+    id          = 'myShellCmd',
+    value       = "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+    description = 'Shell command to run' )
+
+param_activity = pline.ShellCommandActivity(
+    id       = 'MyParamActivity1',
+    name     = 'MyParamActivity1',
+    runsOn   = resource,
+    schedule = schedule,
+    command  = param )
+```
+
 #### Add the objects to the pipeline
 
 ```python
-pipeline.add(schedule, definition, resource, activity)
+pipeline.add(schedule, definition, resource, activity, param_activity)
+```
+
+#### Add the parameters to the pipeline
+
+```python
+pipeline.add_param(param)
+```
+
+#### View the pipeline definition payload
+
+```python
+print pipeline.payload()
+```
+
+#### Validate the pipeline definiton
+
+```python
+pipeline.validate()
 ```
 
 #### Create the pipeline in AWS
