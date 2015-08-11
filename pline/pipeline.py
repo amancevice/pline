@@ -1,4 +1,5 @@
 import boto.datapipeline
+import collections
 import json
 from . import base, keywords
 
@@ -9,21 +10,25 @@ class Pipeline(object):
         self.desc        = desc
         self.region_name = region
         self.pipeline_id = pipeline_id
-        self.objects     = list()
+        self.objects     = PipelineCollection()
+        self.parameters  = PipelineCollection()
 
     @property
     def region(self):
         try:
             return self._region
         except AttributeError:
-            self._region = self.connect()
+            self.connect()
             return self._region
 
     def payload(self, pipeline_id=None):
         """ Pipeline payload. """
+        subdict = lambda dct,keys: { k:dct[k] for k in keys if k in dct }
         payload = {
-            'pipelineId'      : pipeline_id or self.pipeline_id,
-            'pipelineObjects' : self.objects }
+            'pipelineId'       : pipeline_id or self.pipeline_id,
+            'pipelineObjects'  : list(self.objects),
+            'parameterValues'  : map(lambda x: subdict(x, ('id', 'stringValue')), self.parameters),
+            'parameterObjects' : map(lambda x: subdict(x, ('id', 'attributes')), self.parameters) }
 
         return payload
 
@@ -34,6 +39,7 @@ class Pipeline(object):
         role                = 'DataPipelineDefaultRole',
         resourceRole        = 'DataPipelineDefaultResourceRole',
         **kwargs):
+        """ Initialize the 'Default' pipeline definition object. """
         default = base.DataPipelineObject(
                         name                = 'Default',
                         id                  = 'Default',
@@ -59,7 +65,8 @@ class Pipeline(object):
         region_name = region_name or self.region_name
         kwargs.setdefault('aws_access_key_id', aws_access_key_id)
         kwargs.setdefault('aws_secret_access_key', aws_secret_access_key)
-        return boto.datapipeline.connect_to_region(region_name, **kwargs)
+        self._region = boto.datapipeline.connect_to_region(region_name, **kwargs)
+        return self._region
 
     def activate(self):
         """ Activate pipeline. """
@@ -82,10 +89,44 @@ class Pipeline(object):
         """ Create pipeline and set pipeline_id. """
         response = self.region.create_pipeline(self.name, self.unique_id, self.desc)
         self.pipeline_id = response['pipelineId']
-        if any(self.objects):
+        if any(self.objects) or any(self.parameters):
             self.update()
         return response
 
-    def add(self, *objects):
-        """ Add pipeline objects to pipeline. """
-        self.objects += objects
+    def add(self, obj):
+        """ Add an object to the pipeline. """
+        return self.objects.add(obj)
+
+    def add_param(self, param):
+        """ Add a parameter to the pipeline. """
+        return self.parameters.add(param)
+
+
+class PipelineCollection(collections.MutableSet):
+    def __init__(self, *items):
+        map(self.add, items)
+
+    def __contains__(self, item):
+        return item in self.collection
+
+    def __iter__(self):
+        return iter(map(dict, self.collection))
+
+    def __len__(self):
+        return len(self.collection)
+
+    def add(self, *items):
+        for item in items:
+            self.collection.add(item)
+
+    def discard(self, *items):
+        for item in items:
+            self.collection.discard(item)
+
+    @property
+    def collection(self):
+        try:
+            return self._collection
+        except AttributeError:
+            self._collection = set()
+            return self._collection
