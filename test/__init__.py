@@ -2,7 +2,7 @@ __author__ = 'amancevice'
 
 
 import pline
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_dict_equal
 
 
 def test_activity_shape():
@@ -19,7 +19,7 @@ def test_activity_shape():
             { 'key': 'type',           'stringValue': 'ShellCommandActivity' },
             { 'key': 'scriptArgument', 'stringValue': 'hello' },
             { 'key': 'scriptArgument', 'stringValue': 'world' }]}
-    assert_equal(returned, expected)
+    assert_dict_equal(returned, expected)
 
 
 def test_initattr():
@@ -42,13 +42,13 @@ def test_node_shape():
     node.directoryPath = 's3://bucket/pipeline/'
     returned = dict(node)
     expected = {
+        'id'     : 'MyDataNode1',
+        'name'   : 'MyDataNode1',
         'fields' : [
             { 'stringValue' : 'TestGroup',             'key' : 'workerGroup' },
             { 'stringValue' : 's3://bucket/pipeline/', 'key' : 'directoryPath' },
-            { 'stringValue' : 'S3DataNode',            'key' : 'type' }],
-        'id'     : 'MyDataNode1',
-        'name'   : 'MyDataNode1' }
-    assert_equal(returned, expected)
+            { 'stringValue' : 'S3DataNode',            'key' : 'type' }]}
+    assert_dict_equal(returned, expected)
 
 
 def test_param_shape():
@@ -59,13 +59,13 @@ def test_param_shape():
         watermark = 'Choose a value between 0 and 99.')
     returned = dict(my_param)
     expected = {
+        'id'          : 'MyParam1',
+        'stringValue' : 'Here is the value I am using',
         'attributes'  : [
             { 'key': 'type', 'stringValue': 'String' },
             { 'key': 'description', 'stringValue': 'This value is extremely important' },
-            { 'key': 'watermark', 'stringValue': 'Choose a value between 0 and 99.' }],
-        'id'          : 'MyParam1',
-        'stringValue' : 'Here is the value I am using' }
-    assert_equal(returned, expected)
+            { 'key': 'watermark', 'stringValue': 'Choose a value between 0 and 99.' }]}
+    assert_dict_equal(returned, expected)
 
 
 class MyCustomS3DataNode(pline.S3DataNode):
@@ -110,7 +110,7 @@ def test_pipeline_assembly():
 
     param = pline.String(
         id          = 'myShellCmd',
-        value       = "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+        value       = 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt',
         description = 'Shell command to run' )
 
     param_activity = pline.ShellCommandActivity(
@@ -126,50 +126,18 @@ def test_pipeline_assembly():
 
     returned = pipeline.payload()
     expected = {
-        'parameterValues': [
-            {'stringValue': 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt', 'id': 'myShellCmd'}],
-        'pipelineObjects': [{
-            'fields': [
-                {'stringValue': 'DataPipelineDefaultResourceRole', 'key': 'resourceRole'},
-                {'stringValue': 'DataPipelineDefaultRole', 'key': 'role'},
-                {'stringValue': 'Ec2Resource', 'key': 'type'},
-                {'refValue': 'Schedule1', 'key': 'schedule'}],
-            'id': 'Resource1', 'name': 'Resource'}, {
+        'pipelineId'       : None,
+        'parameterValues'  : [{'stringValue': 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt', 'id': 'myShellCmd'}],
+        'parameterObjects' : [{'attributes': [{'stringValue': 'String', 'key': 'type'}, {'stringValue': 'Shell command to run', 'key': 'description'}], 'id': 'myShellCmd'}],
+        'pipelineObjects'  : [{'fields': [{'stringValue': 'DataPipelineDefaultResourceRole', 'key': 'resourceRole'}, {'stringValue': 'DataPipelineDefaultRole', 'key': 'role'}, {'stringValue': 'Ec2Resource', 'key': 'type'}, {'refValue': 'Schedule1', 'key': 'schedule'}], 'id': 'Resource1', 'name': 'Resource'}, {'fields': [{'stringValue': '#{myShellCmd}', 'key': 'command'}, {'refValue': 'Schedule1', 'key': 'schedule'}, {'stringValue': 'ShellCommandActivity', 'key': 'type'}, {'refValue': 'Resource1', 'key': 'runsOn'}], 'id': 'MyParamActivity1', 'name': 'MyParamActivity1'}, {'fields': [{'stringValue': 'echo hello world', 'key': 'command'}, {'refValue': 'Schedule1', 'key': 'schedule'}, {'stringValue': 'ShellCommandActivity', 'key': 'type'}, {'refValue': 'Resource1', 'key': 'runsOn'}], 'id': 'MyActivity1', 'name': 'MyActivity'}, {'fields': [{'stringValue': 'FIRST_ACTIVATION_DATE_TIME', 'key': 'startAt'}, {'stringValue': 'Schedule', 'key': 'type'}, {'stringValue': '1 day', 'key': 'period'}, {'stringValue': '1', 'key': 'occurrences'}], 'id': 'Schedule1', 'name': 'Schedule'}, {'fields': [{'stringValue': 's3://bucket/pipeline/log', 'key': 'pipelineLogUri'}, {'refValue': 'Schedule1', 'key': 'schedule'}, {'stringValue': 'DataPipelineDefaultResourceRole', 'key': 'resourceRole'}, {'stringValue': 'CASCADE', 'key': 'failureAndRerunMode'}, {'stringValue': 'DataPipelineDefaultRole', 'key': 'role'}, {'stringValue': 'cron', 'key': 'scheduleType'}], 'id': 'Default', 'name': 'Default'}]}
+    for i, val in enumerate(returned['parameterValues']):
+        yield assert_dict_equal, val, expected['parameterValues'][i]
+    for i, val in enumerate(returned['parameterObjects']):
+        yield assert_dict_equal, val, expected['parameterObjects'][i]
+    for i, val in enumerate(returned['pipelineObjects']):
+        yield assert_equal, val['id'], expected['pipelineObjects'][i]['id']
+        yield assert_equal, val['name'], expected['pipelineObjects'][i]['name']
+        for j, field in enumerate(val['fields']):
+            yield assert_dict_equal, field, expected['pipelineObjects'][i]['fields'][j]
 
-            'fields': [
-                {'stringValue': '#{myShellCmd}', 'key': 'command'},
-                {'refValue': 'Schedule1', 'key': 'schedule'},
-                {'stringValue': 'ShellCommandActivity', 'key': 'type'},
-                {'refValue': 'Resource1', 'key': 'runsOn'}],
-            'id': 'MyParamActivity1', 'name': 'MyParamActivity1'}, {
-
-            'fields': [
-                {'stringValue': 'echo hello world', 'key': 'command'},
-                {'refValue': 'Schedule1', 'key': 'schedule'},
-                {'stringValue': 'ShellCommandActivity', 'key': 'type'},
-                {'refValue': 'Resource1', 'key': 'runsOn'}],
-            'id': 'MyActivity1', 'name': 'MyActivity'}, {
-
-            'fields': [
-                {'stringValue': 'FIRST_ACTIVATION_DATE_TIME', 'key': 'startAt'},
-                {'stringValue': 'Schedule', 'key': 'type'},
-                {'stringValue': '1 day', 'key': 'period'},
-                {'stringValue': '1', 'key': 'occurrences'}],
-            'id': 'Schedule1', 'name': 'Schedule'}, {
-
-
-            'fields': [
-                {'stringValue': 's3://bucket/pipeline/log', 'key': 'pipelineLogUri'},
-                {'refValue': 'Schedule1', 'key': 'schedule'},
-                {'stringValue': 'DataPipelineDefaultResourceRole', 'key': 'resourceRole'},
-                {'stringValue': 'CASCADE', 'key': 'failureAndRerunMode'},
-                {'stringValue': 'DataPipelineDefaultRole', 'key': 'role'},
-                {'stringValue': 'cron', 'key': 'scheduleType'}],
-            'id': 'Default', 'name': 'Default'}],
-        'pipelineId': None,
-        'parameterObjects': [{
-            'attributes': [
-                {'stringValue': 'String', 'key': 'type'},
-                {'stringValue': 'Shell command to run', 'key': 'description'}],
-            'id': 'myShellCmd'}]}
-    assert_equal(returned, expected)
+    #assert_dict_equal(returned, expected)

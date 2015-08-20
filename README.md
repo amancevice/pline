@@ -172,7 +172,7 @@ activity = pline.ShellCommandActivity(
 ```python
 param = pline.String(
     id          = 'myShellCmd',
-    value       = "grep -rc \"GET\" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt",
+    value       = 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt',
     description = 'Shell command to run' )
 
 param_activity = pline.ShellCommandActivity(
