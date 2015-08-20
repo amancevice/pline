@@ -93,13 +93,13 @@ class Pipeline(object):
             self.update()
         return response
 
-    def add(self, obj):
+    def add(self, *objects):
         """ Add an object to the pipeline. """
-        return self.objects.add(obj)
+        return self.objects.add(*objects)
 
-    def add_param(self, param):
+    def add_param(self, *params):
         """ Add a parameter to the pipeline. """
-        return self.parameters.add(param)
+        return self.parameters.add(*params)
 
 
 class PipelineCollection(collections.MutableSet):
@@ -116,15 +116,18 @@ class PipelineCollection(collections.MutableSet):
         return len(self.collection)
 
     def add(self, *items):
+        """ Add one or more items to the collection. """
         for item in items:
             self.collection.add(item)
 
     def discard(self, *items):
+        """ Discard one or more items from the collection. """
         for item in items:
             self.collection.discard(item)
 
     @property
     def collection(self):
+        """ Collection component. """
         try:
             return self._collection
         except AttributeError:

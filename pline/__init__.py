@@ -1,3 +1,6 @@
+__author__ = 'amancevice'
+
+
 from .base import DataPipelineObject
 from .base import DataPipelineParameter
 from .base import TypedDataPipelineObject

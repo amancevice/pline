@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.2.2
+* Fixed regression in pipeline.add() 
+
 0.2.1
 * Fixed bug in Pipeline.validate()
 
