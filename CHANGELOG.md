@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.2.1
+* Fixed bug in Pipeline.validate()
+
 0.2.0
 * Added parameter support
 * Re-tooled the way things work under the hood a bit

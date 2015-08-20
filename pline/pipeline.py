@@ -83,7 +83,7 @@ class Pipeline(object):
         """ Validate the pipeline definition. """
         assert self.pipeline_id is not None, "pipeline_id is None"
         payload = json.dumps(self.payload(self.pipeline_id))
-        return self.make_request(action='ValidatePipelineDefinition', body=payload)
+        return self.region.make_request(action='ValidatePipelineDefinition', body=payload)
 
     def create(self):
         """ Create pipeline and set pipeline_id. """
