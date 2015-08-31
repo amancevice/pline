@@ -1,3 +1,12 @@
+__all__ = [
+    'actionOnResourceFailure',
+    'actionOnTaskFailure',
+    'failureAndRerunMode',
+    's3EncryptionType',
+    'scheduleType',
+    'startAt' ]
+
+
 def _keywords(*values):
     return type('KEYWORD', (), dict([('__slots__', values)] + [(v,v) for v in values]))
 

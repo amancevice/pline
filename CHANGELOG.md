@@ -1,5 +1,8 @@
 # pline Changelog
 
+0.3.0
+* Moved imports into their modules because the main module was getting crowded
+
 0.2.2
 * Fixed regression in pipeline.add() 
 

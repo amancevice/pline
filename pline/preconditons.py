@@ -1,4 +1,15 @@
+__all__ = [
+    'Precondition',
+    'DynamoDBDataExists',
+    'DynamoDBTableExists',
+    'Exists',
+    'S3KeyExists',
+    'S3PrefixNotEmpty',
+    'ShellCommandPrecondition' ]
+
+
 from . import base
+
 
 class Precondition(base.TypedDataPipelineObject): pass
 

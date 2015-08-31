@@ -2,6 +2,7 @@ import collections
 import itertools
 from . import keywords
 
+
 class DataPipelineBase(collections.Iterable):
     def __init__(self, **kwargs):
         for k,v in kwargs.iteritems():

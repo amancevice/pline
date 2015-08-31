@@ -2,7 +2,7 @@
 
 AWS Data Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.2.0`
+Last updated: `0.3.0`
 
 ## Installation
 
@@ -17,7 +17,10 @@ provides the tools to model your pipeline using Python objects and transform the
 into the expected data structure.
 
 ```python
-my_activity = pline.ShellCommandActivity(name='MyActivity', id='Activity_adbc1234')
+import pline
+
+my_activity = pline.activities.ShellCommandActivity(
+    name='MyActivity', id='Activity_adbc1234')
 my_activity.command = "echo $1 $2"
 my_activity.scriptArgument = ['hello', 'world']
 
@@ -45,7 +48,8 @@ handled internally by the object and should not be accessed directly.
 Setting an object's attribute can be done via the initialization call or after the fact:
 
 ```python
-node = pline.S3DataNode(id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
+node = pline.data_nodes.S3DataNode(
+    id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
 # => <S3DataNode name: "MyDataNode1", id: "MyDataNode1">
 node.directoryPath = 's3://bucket/pipeline/'
 print node.workerGroup
@@ -73,7 +77,7 @@ As of `0.2.0`, `pline` supports passing parameters to data pipelines. Parameters
 pipeline and passed into `DataPipelineObject` instances.
 
 ```python
-my_param = pline.String(
+my_param = pline.parameters.String(
     id = 'MyParam1',
     value = 'Here is the value I am using',
     description = 'This value is extremely important',
@@ -147,7 +151,7 @@ definition = pipeline.definition( schedule,
 This will be the machine running the tasks.
 
 ```python
-resource = pline.Ec2Resource(
+resource = pline.resources.Ec2Resource(
     id           = 'Resource1',
     name         = 'Resource',
     role         = 'DataPipelineDefaultRole',
@@ -158,7 +162,7 @@ resource = pline.Ec2Resource(
 #### Create an activity
 
 ```python
-activity = pline.ShellCommandActivity(
+activity = pline.activities.ShellCommandActivity(
     id       = 'MyActivity1',
     name     = 'MyActivity',
     runsOn   = resource,
@@ -170,12 +174,12 @@ activity = pline.ShellCommandActivity(
 #### Create a parameterized activity and its parameter
 
 ```python
-param = pline.String(
+param = pline.parameters.String(
     id          = 'myShellCmd',
     value       = 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt',
     description = 'Shell command to run' )
 
-param_activity = pline.ShellCommandActivity(
+param_activity = pline.activities.ShellCommandActivity(
     id       = 'MyParamActivity1',
     name     = 'MyParamActivity1',
     runsOn   = resource,
@@ -221,7 +225,7 @@ Sometimes you may want to add an object to the pipeline after it has been create
 
 ```python
 # Add an alert
-sns_alarm = pline.SnsAlarm(
+sns_alarm = pline.actions.SnsAlarm(
     name     = 'SnsAlarm',
     id       = 'SnsAlarm1',
     topicArn = 'arn:aws:sns:us-east-1:12345678abcd:my-arn',
@@ -246,7 +250,7 @@ pipeline.activate()
 The `ShellCommand` class can be used to compose chained commands
 
 ```python
-cmd = pline.ShellCommand(
+cmd = pline.utils.ShellCommand(
     'docker start registry',
     'sleep 3',
     'docker pull localhost:5000/my_docker',

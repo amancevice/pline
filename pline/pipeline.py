@@ -1,7 +1,10 @@
+__all__ = [ 'Pipeline' ]
+
 import boto.datapipeline
 import collections
 import json
 from . import base, keywords
+
 
 class Pipeline(object):
     def __init__(self, name, unique_id, desc=None, region='us-east-1', pipeline_id=None):
