@@ -6,7 +6,7 @@ from nose.tools import assert_equal, assert_dict_equal, assert_true
 
 
 def test_activity_shape():
-    my_activity = pline.ShellCommandActivity(name='MyActivity', id='Activity_adbc1234')
+    my_activity = pline.activities.ShellCommandActivity(name='MyActivity', id='Activity_adbc1234')
     my_activity.command = "echo $1 $2"
     my_activity.scriptArgument = ['hello', 'world']
 
@@ -23,14 +23,16 @@ def test_activity_shape():
 
 
 def test_initattr():
-    node     = pline.S3DataNode(id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
+    node     = pline.data_nodes.S3DataNode(
+        id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
     returned = node.workerGroup
     expected = 'TestGroup'
     assert_equal(returned, expected)
 
 
 def test_setattr():
-    node = pline.S3DataNode(id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
+    node = pline.data_nodes.S3DataNode(
+        id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
     node.directoryPath = 's3://bucket/pipeline/'
     returned = node.directoryPath
     expected = 's3://bucket/pipeline/'
@@ -38,7 +40,8 @@ def test_setattr():
 
 
 def test_node_shape():
-    node = pline.S3DataNode(id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
+    node = pline.data_nodes.S3DataNode(
+        id='MyDataNode1', name='MyDataNode1', workerGroup='TestGroup')
     node.directoryPath = 's3://bucket/pipeline/'
     returned = dict(node)
     expected = {
@@ -52,7 +55,7 @@ def test_node_shape():
 
 
 def test_param_shape():
-    my_param = pline.String(
+    my_param = pline.parameters.String(
         id = 'MyParam1',
         value = 'Here is the value I am using',
         description = 'This value is extremely important',
@@ -68,7 +71,7 @@ def test_param_shape():
     assert_dict_equal(returned, expected)
 
 
-class MyCustomS3DataNode(pline.S3DataNode):
+class MyCustomS3DataNode(pline.data_nodes.S3DataNode):
     TYPE_NAME = 'S3DataNode'
 
 
@@ -88,32 +91,32 @@ def test_pipeline_assembly():
         id          = 'Schedule1',
         name        = 'Schedule',
         period      = '1 day',
-        startAt     = pline.startAt.FIRST_ACTIVATION_DATE_TIME,
+        startAt     = pline.keywords.startAt.FIRST_ACTIVATION_DATE_TIME,
         occurrences = 1 )
 
     definition = pipeline.definition( schedule,
         pipelineLogUri = "s3://bucket/pipeline/log" )
 
-    resource = pline.Ec2Resource(
+    resource = pline.resources.Ec2Resource(
         id           = 'Resource1',
         name         = 'Resource',
         role         = 'DataPipelineDefaultRole',
         resourceRole = 'DataPipelineDefaultResourceRole',
         schedule     = schedule )
 
-    activity = pline.ShellCommandActivity(
+    activity = pline.activities.ShellCommandActivity(
         id       = 'MyActivity1',
         name     = 'MyActivity',
         runsOn   = resource,
         schedule = schedule,
         command  = 'echo hello world' )
 
-    param = pline.String(
+    param = pline.parameters.String(
         id          = 'myShellCmd',
         value       = 'grep -rc "GET" ${INPUT1_STAGING_DIR}/* > ${OUTPUT1_STAGING_DIR}/output.txt',
         description = 'Shell command to run' )
 
-    param_activity = pline.ShellCommandActivity(
+    param_activity = pline.activities.ShellCommandActivity(
         id       = 'MyParamActivity1',
         name     = 'MyParamActivity1',
         runsOn   = resource,
