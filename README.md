@@ -1,5 +1,7 @@
 # pline Python library
 
+<img src="https://travis-ci.org/amancevice/pline.svg?branch=master"/>
+
 AWS Data Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
 
 Last updated: `0.3.0`
