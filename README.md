@@ -2,9 +2,9 @@
 
 <img src="https://travis-ci.org/amancevice/pline.svg?branch=master"/>
 
-AWS Data Pipeline Wrapper for `boto`. Construct a Data Pipeline using Python objects.
+AWS Data Pipeline Wrapper for `boto3`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.3.0`
+Last updated: `0.4.0`
 
 ## Installation
 
@@ -14,7 +14,7 @@ pip install pline
 
 ## Overview
 
-The payload `boto` requires for a pipeline definition is somewhat complex. This library 
+The payload `boto3` requires for a pipeline definition is somewhat complex. This library 
 provides the tools to model your pipeline using Python objects and transform the payload
 into the expected data structure.
 
@@ -135,7 +135,7 @@ schedule = pline.Schedule(
     id          = 'Schedule1',
     name        = 'Schedule',
     period      = '1 day',
-    startAt     = pline.startAt.FIRST_ACTIVATION_DATE_TIME,
+    startAt     = pline.keywords.startAt.FIRST_ACTIVATION_DATE_TIME,
     occurrences = 1 )
 ```
 

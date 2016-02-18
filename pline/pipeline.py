@@ -1,8 +1,7 @@
 __all__ = [ 'Pipeline' ]
 
-import boto.datapipeline
 import collections
-import json
+import boto3
 from . import base, keywords
 
 
@@ -17,80 +16,68 @@ class Pipeline(object):
         self.parameters  = PipelineCollection()
 
     @property
-    def region(self):
+    def client(self):
         try:
-            return self._region
+            return self._client
         except AttributeError:
             self.connect()
-            return self._region
+            return self._client
 
     def payload(self, pipeline_id=None):
         """ Pipeline payload. """
         subdict = lambda dct,keys: { k:dct[k] for k in keys if k in dct }
-        payload = {
+        values  = lambda x: subdict(x, ('id', 'stringValue'))
+        objects = lambda x: subdict(x, ('id', 'attributes'))
+        return {
             'pipelineId'       : pipeline_id or self.pipeline_id,
             'pipelineObjects'  : list(self.objects),
-            'parameterValues'  : map(lambda x: subdict(x, ('id', 'stringValue')), self.parameters),
-            'parameterObjects' : map(lambda x: subdict(x, ('id', 'attributes')), self.parameters) }
+            'parameterValues'  : map(values, self.parameters),
+            'parameterObjects' : map(objects, self.parameters) }
 
-        return payload
-
-    def definition(self, schedule,
-        scheduleType        = keywords.scheduleType.cron,
-        failureAndRerunMode = keywords.failureAndRerunMode.CASCADE,
-        pipelineLogUri      = None,
-        role                = 'DataPipelineDefaultRole',
-        resourceRole        = 'DataPipelineDefaultResourceRole',
-        **kwargs):
+    def definition(self, schedule, **kwargs):
         """ Initialize the 'Default' pipeline definition object. """
-        default = base.DataPipelineObject(
-                        name                = 'Default',
-                        id                  = 'Default',
-                        scheduleType        = scheduleType,
-                        failureAndRerunMode = failureAndRerunMode,
-                        pipelineLogUri      = pipelineLogUri,
-                        role                = role,
-                        resourceRole        = resourceRole,
-                        schedule            = schedule,
-                        **kwargs )
-        return default
+        kwargs.setdefault('scheduleType',        keywords.scheduleType.cron)
+        kwargs.setdefault('failureAndRerunMode', keywords.failureAndRerunMode.CASCADE)
+        kwargs.setdefault('role',                'DataPipelineDefaultRole')
+        kwargs.setdefault('resourceRole',        'DataPipelineDefaultResourceRole')
+        kwargs['schedule'] = schedule
+        return base.DataPipelineObject(name='Default', id='Default', **kwargs)
 
-    def connect(self, region_name=None, aws_access_key_id=None, aws_secret_access_key=None, **kwargs):
+    def connect(self, *args, **kwargs):
         """ Connect to AWS region.
 
             Arguments:
-                region_name           (str):  Optional AWS region name
-                aws_access_key_id     (str):  Optional AWS Access Key
-                aws_secret_access_key (str):  Optional AWS Secret Key
+                args   (tuple): Arguments to pass to boto3.client() after 'datapipeline'
+                kwargs (dict):  Keyword arguments to pass to boto3.client()
+                                excluding service_name='datapipeline'
 
             Returns:
                 A handle to the boto connection. """
-        region_name = region_name or self.region_name
-        kwargs.setdefault('aws_access_key_id', aws_access_key_id)
-        kwargs.setdefault('aws_secret_access_key', aws_secret_access_key)
-        self._region = boto.datapipeline.connect_to_region(region_name, **kwargs)
-        return self._region
+        kwargs.setdefault('region_name', self.region_name)
+        self._client = boto3.client('datapipeline', *args, **kwargs)
+        return self._client
 
-    def activate(self):
+    def activate(self, **kwargs):
         """ Activate pipeline. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        return self.region.activate_pipeline(self.pipeline_id)
+        return self.client.activate_pipeline(pipelineId=self.pipeline_id, **kwargs)
 
     def update(self):
         """ Update pipeline definition with self.objects. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        payload = json.dumps(self.payload(self.pipeline_id))
-        return self.region.make_request(action='PutPipelineDefinition', body=payload)
+        return self.client.put_pipeline_definition(**self.payload())
 
     def validate(self):
         """ Validate the pipeline definition. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        payload = json.dumps(self.payload(self.pipeline_id))
-        return self.region.make_request(action='ValidatePipelineDefinition', body=payload)
+        return self.client.validate_pipeline_definition(**self.payload())
 
     def create(self):
         """ Create pipeline and set pipeline_id. """
-        response = self.region.create_pipeline(self.name, self.unique_id, self.desc)
+        response = self.client.create_pipeline(
+            name        = self.name,
+            uniqueId    = self.unique_id,
+            description = self.desc)
         self.pipeline_id = response['pipelineId']
         if any(self.objects) or any(self.parameters):
             self.update()
