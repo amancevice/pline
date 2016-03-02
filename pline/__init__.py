@@ -1,4 +1,5 @@
 __author__ = 'amancevice'
+__version__ = '0.4.1'
 
 
 from . import base

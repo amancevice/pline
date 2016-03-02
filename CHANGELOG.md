@@ -1,5 +1,11 @@
 # pline Changelog
 
+0.4.1
+* Better setup.py
+
+0.4.0
+* boto3
+
 0.3.0
 * Moved imports into their modules because the main module was getting crowded
 

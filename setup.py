@@ -1,14 +1,19 @@
 import os
+import re
 from setuptools import setup
 
 NAME    = 'pline'
-VERSION = '0.4.0'
 AUTHOR  = 'amancevice'
 EMAIL   = 'smallweirdnum@gmail.com'
 DESC    = 'AWS Data Pipeline Wrapper'
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+def version():
+    search = r"^__version__ *= *['\"]([0-9.]+)['\"]"
+    initpy = read("./%s/__init__.py" % NAME)
+    return re.search(search, initpy, re.MULTILINE).group(1)
 
 CLASSIFIERS = [
     "Development Status :: 3 - Alpha",
@@ -23,7 +28,7 @@ TEST_REQUIRES = ["mock", "nose"]
 
 setup(
     name                 = NAME,
-    version              = VERSION,
+    version              = version(),
     author               = AUTHOR,
     author_email         = EMAIL,
     packages             = [ NAME ],
