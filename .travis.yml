@@ -5,3 +5,10 @@ install:
   - pip install tox
 script:
   - tox
+deploy:
+  provider: pypi
+  user: amancevice
+  password:
+    secure: w+2CzJ/qGCyqZpPE3SP7VgezRMM8KG5L72LxQ6Ec9D33x7Am5zFjWq/61iWFEIzgHDGapaVDQYL3R50RlU5eVAWWkc+Ulsro2HaTW7exl4yymWFV7acjjhSMz7AM8I9KQO6KH/3N9+EpQdmGEiM5o15XuZsFbOB7LHuam36s3NfmH90xo175MmV0RfPcbVcR6vD4pI/De3YFh6qRNBwx25mROeB+q925H6M4OhZoEhbc8Rboc6y9ToHxwu0v0XlpcGX91vv6fuMf5osMA1cz4zDWBtepeummR3FMaziGeRmRbVW4h6tHHj7PaP8NjpsiQDPPoIVjdv91SaAXYE93DpdTu4aw17wQegIXVYfur1KERnsPugLcbkjRrOYyoAdxuisQg0wl7eiZblc8Oh6AsYkb3yC2IUVAEVxLV3MpnHRzN62Ws7bwN8uUvpOkWocV/YjHy5oZpzexeHTlUZROnscGWnEr1/y38H2NShZwyK8D1Q3840p+FsL5DJJOvQAkYbIFy6FUoSdxBlz5z9BBxwINSSihVXKDbO1Kd4JP2C24hXIeeEsSWWFcm2VYyyQqx9W+8S/mERVkAzZItS+HZoBPYZmXVSDFk9VT0Tcr6mtazscpGHSplt9YsJsx5xcH2TH+R7bOwhDKMKb54gLaZTFiQP3lKvltGLzwon4WtdI=
+  on:
+    tags: true
