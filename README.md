@@ -4,7 +4,7 @@
 
 AWS Data Pipeline Wrapper for `boto3`. Construct a Data Pipeline using Python objects.
 
-Last updated: `0.4.0`
+Last updated: `0.4.2`
 
 ## Installation
 
