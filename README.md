@@ -124,8 +124,8 @@ the environmental level. If you want to connect using a specific configuration:
 
 ```python
 pipeline.connect(
-    aws_access_key_id        = 'my_access_key',
-    aws_secret_access_key_id = 'my_secret_key' )
+    aws_access_key_id     = 'my_access_key',
+    aws_secret_access_key = 'my_secret_key' )
 ```
 
 #### Create a schedule object

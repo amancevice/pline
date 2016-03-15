@@ -2,7 +2,8 @@ __all__ = [ 'Pipeline' ]
 
 import collections
 import boto3
-from . import base, keywords
+import botocore
+from . import base, exceptions, keywords
 
 
 class Pipeline(object):
@@ -60,24 +61,36 @@ class Pipeline(object):
     def activate(self, **kwargs):
         """ Activate pipeline. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        return self.client.activate_pipeline(pipelineId=self.pipeline_id, **kwargs)
+        try:
+            return self.client.activate_pipeline(pipelineId=self.pipeline_id, **kwargs)
+        except botocore.exceptions.ClientError as err:
+            raise exceptions.ClientError(err)
 
     def update(self):
         """ Update pipeline definition with self.objects. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        return self.client.put_pipeline_definition(**self.payload())
+        try:
+            return self.client.put_pipeline_definition(**self.payload())
+        except botocore.exceptions.ClientError as err:
+            raise exceptions.ClientError(err)
 
     def validate(self):
         """ Validate the pipeline definition. """
         assert self.pipeline_id is not None, "pipeline_id is None"
-        return self.client.validate_pipeline_definition(**self.payload())
+        try:
+            return self.client.validate_pipeline_definition(**self.payload())
+        except botocore.exceptions.ClientError as err:
+            raise exceptions.ClientError(err)
 
     def create(self):
         """ Create pipeline and set pipeline_id. """
-        response = self.client.create_pipeline(
-            name        = self.name,
-            uniqueId    = self.unique_id,
-            description = self.desc)
+        try:
+            response = self.client.create_pipeline(
+                name        = self.name,
+                uniqueId    = self.unique_id,
+                description = self.desc)
+        except botocore.exceptions.ClientError as err:
+            raise exceptions.ClientError(err)
         self.pipeline_id = response['pipelineId']
         if any(self.objects) or any(self.parameters):
             self.update()
