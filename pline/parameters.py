@@ -1,11 +1,14 @@
+""" DataPipeline Parameters. """
+
+
+from . import base
+
+
 __all__ = [
     'String',
     'Integer',
     'Double',
-    'AwsS3ObjectKey' ]
-
-
-from . import base
+    'AwsS3ObjectKey']
 
 
 class String(base.TypedDataPipelineParameter): pass

@@ -1,9 +1,13 @@
-__all__ = [ 'Pipeline' ]
+""" DataPipeline. """
+
 
 import collections
 import boto3
 import botocore
 from . import base, exceptions, keywords
+
+
+__all__ = ['Pipeline']
 
 
 class Pipeline(object):
@@ -15,14 +19,13 @@ class Pipeline(object):
         self.pipeline_id = pipeline_id
         self.objects     = PipelineCollection()
         self.parameters  = PipelineCollection()
+        self._client     = None
 
     @property
     def client(self):
-        try:
-            return self._client
-        except AttributeError:
+        if self._client is None:
             self.connect()
-            return self._client
+        return self._client
 
     def payload(self, pipeline_id=None):
         """ Pipeline payload. """
@@ -35,7 +38,8 @@ class Pipeline(object):
             'parameterValues'  : map(values, self.parameters),
             'parameterObjects' : map(objects, self.parameters) }
 
-    def definition(self, schedule, **kwargs):
+    @staticmethod
+    def definition(schedule, **kwargs):
         """ Initialize the 'Default' pipeline definition object. """
         kwargs.setdefault('scheduleType',        keywords.scheduleType.cron)
         kwargs.setdefault('failureAndRerunMode', keywords.failureAndRerunMode.CASCADE)
@@ -107,7 +111,9 @@ class Pipeline(object):
 
 class PipelineCollection(collections.MutableSet):
     def __init__(self, *items):
-        map(self.add, items)
+        self._collection = set()
+        for item in items:
+            self.add(item)
 
     def __contains__(self, item):
         return item in self.collection
@@ -131,8 +137,4 @@ class PipelineCollection(collections.MutableSet):
     @property
     def collection(self):
         """ Collection component. """
-        try:
-            return self._collection
-        except AttributeError:
-            self._collection = set()
-            return self._collection
+        return self._collection

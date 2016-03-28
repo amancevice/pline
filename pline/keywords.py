@@ -1,10 +1,13 @@
+""" DataPipeline Keywords. """
+
+
 __all__ = [
     'actionOnResourceFailure',
     'actionOnTaskFailure',
     'failureAndRerunMode',
     's3EncryptionType',
     'scheduleType',
-    'startAt' ]
+    'startAt']
 
 
 def _keywords(*values):

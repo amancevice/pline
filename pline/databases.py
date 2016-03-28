@@ -1,11 +1,14 @@
+""" DataPipeline Databases. """
+
+
+from . import base
+
+
 __all__ = [
     'Database',
     'JdbcDatabase',
     'RdsDatabase',
-    'RedshiftDatabase' ]
-
-
-from . import base
+    'RedshiftDatabase']
 
 
 class Database(base.TypedDataPipelineObject): pass

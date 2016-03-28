@@ -1,12 +1,16 @@
+""" DataPipeline Data Nodes. """
+
+
+from . import base
+
+
 __all__ = [
     'DataNode',
     'DynamoDBDataNode',
     'MySqlDataNode',
     'RedshiftDataNode',
     'S3DataNode',
-    'SqlDataNode' ]
-
-from . import base
+    'SqlDataNode']
 
 
 class DataNode(base.RunnableObject): pass

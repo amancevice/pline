@@ -1,3 +1,9 @@
+""" DataPipeline Preconditions. """
+
+
+from . import base
+
+
 __all__ = [
     'Precondition',
     'DynamoDBDataExists',
@@ -5,10 +11,7 @@ __all__ = [
     'Exists',
     'S3KeyExists',
     'S3PrefixNotEmpty',
-    'ShellCommandPrecondition' ]
-
-
-from . import base
+    'ShellCommandPrecondition']
 
 
 class Precondition(base.TypedDataPipelineObject): pass

@@ -1,5 +1,4 @@
-__author__ = 'amancevice'
-__version__ = '0.4.2'
+""" Pline DataPipeline Helper. """
 
 
 from . import base
@@ -15,3 +14,7 @@ from . import resources
 from . import utils
 from .base import Schedule
 from .pipeline import Pipeline
+
+
+__author__ = 'amancevice'
+__version__ = '0.4.3'

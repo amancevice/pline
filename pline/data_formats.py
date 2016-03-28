@@ -1,3 +1,9 @@
+""" DataPipeline Data Formats. """
+
+
+from . import base
+
+
 __all__ = [
     'DataFormat',
     'CSV',
@@ -5,10 +11,7 @@ __all__ = [
     'DynamoDBDataFormat',
     'DynamoDBExportDataFormat',
     'RegEx',
-    'TSV' ]
-
-
-from . import base
+    'TSV']
 
 
 class DataFormat(base.TypedDataPipelineObject): pass

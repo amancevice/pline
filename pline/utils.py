@@ -1,4 +1,7 @@
-__all__ = [ 'ShellCommand' ]
+""" DataPipeline Utils. """
+
+
+__all__ = ['ShellCommand']
 
 
 class ShellCommand(object):
@@ -14,4 +17,5 @@ class ShellCommand(object):
         return repr(self)
 
     def append(self, *args):
-        map(self._commands.append, args)
+        for arg in args:
+            self._commands.append(arg)

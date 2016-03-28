@@ -1,3 +1,9 @@
+""" DataPipeline Activities. """
+
+
+from . import base
+
+
 __all__ = [
     'Activity',
     'CopyActivity',
@@ -7,10 +13,7 @@ __all__ = [
     'PigActivity',
     'RedshiftCopyActivity',
     'ShellCommandActivity',
-    'SqlActivity' ]
-
-
-from . import base, keywords
+    'SqlActivity']
 
 
 class Activity(base.RunnableObject): pass

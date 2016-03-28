@@ -1,12 +1,15 @@
+""" DataPipeline Base. """
+
+
 import collections
 import itertools
-from . import keywords
 
 
 class DataPipelineBase(collections.Iterable):
     def __init__(self, **kwargs):
-        for k,v in kwargs.iteritems():
-            setattr(self, k, v)
+        self._items = dict()
+        for key, val in kwargs.iteritems():
+            setattr(self, key, val)
 
     def __iter__(self):
         raise NotImplementedError
@@ -48,11 +51,7 @@ class DataPipelineParameter(DataPipelineBase):
 
     @property
     def attributes(self):
-        try:
-            return self._items
-        except AttributeError:
-            self._items = dict()
-            return self._items
+        return self._items
 
 
 class TypedDataPipelineParameter(DataPipelineParameter):
@@ -86,8 +85,8 @@ class DataPipelineObject(DataPipelineBase):
         def iterhelper(keyvalue):
             key, value = keyvalue
             if isinstance(value, list):
-                for x in value:
-                    for item in iterhelper((key,x)):
+                for val in value:
+                    for item in iterhelper((key, val)):
                         yield item
             elif isinstance(value, DataPipelineObject):
                 yield { 'key' : key, 'refValue' : value.id }
