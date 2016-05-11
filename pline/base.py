@@ -94,7 +94,7 @@ class DataPipelineObject(DataPipelineBase):
                 yield { 'key' : key, 'stringValue' : "#{%s}" % value.id }
             elif isinstance(value, bool):
                 yield { 'key' : key, 'stringValue' : str(value).lower() }
-            else:
+            elif value is not None:
                 yield { 'key' : key, 'stringValue' : str(value) }
 
         yield 'id',     self.id
