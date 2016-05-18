@@ -17,4 +17,4 @@ from .pipeline import Pipeline
 
 
 __author__ = 'amancevice'
-__version__ = '0.4.3'
+__version__ = '0.4.4'
