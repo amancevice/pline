@@ -1,9 +1,12 @@
 # pline Changelog
 
-0.4.4
+0.4.3
 * Added support for ondemand scheduleType
 * Made it so setting a pipeline object property to None causes it to not appear in the pipeline 
   definition.
+
+0.4.2
+* Travis fixes
 
 0.4.1
 * Better setup.py
