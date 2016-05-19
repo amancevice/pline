@@ -24,7 +24,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 2.7",
     "Topic :: Utilities" ]
 REQUIRES = ["boto3>=1.2.3"]
-TEST_REQUIRES = ["mock", "nose"]
+TESTS_REQUIRE = ["mock", "nose"]
 
 setup(
     name                 = NAME,
@@ -39,5 +39,5 @@ setup(
     long_description     = read('README.md'),
     classifiers          = CLASSIFIERS,
     install_requires     = REQUIRES,
-    test_requires        = TEST_REQUIRES,
+    tests_require        = TESTS_REQUIRE,
     test_suite           = "nose.collector" )
